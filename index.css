@@ -1,0 +1,31 @@
+body {
+    background-color: darkgrey;
+}
+.container {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5vh;
+    display: flex;
+    height: 80vh;
+    width: 60vw;
+    background-color: grey;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+#rotating {
+    height: 10vh;
+    width: auto;
+    animation: rotation 12s infinite linear;
+}
+
+@keyframes rotation {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}

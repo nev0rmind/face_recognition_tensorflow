@@ -1,36 +1,73 @@
 "use strict";
 
 /*
+COPYPASTECOPYPASTE
+Import API & Monkeypatch aus Python for NodeJS 
 
+Uncaught (in promise) Error: ENOENT: no such file or directory, 
+open './assets/shards/tiny_face_detector_model-weights_manifest.json'
+*/
+/*
+import * as faceapi from 'face-api.js';
 
-navigator.getUserMedia = (
-    navigator.getUserMedia ||
-    navigator.webkitGetUserMedia ||
-    navigator.mozGetUserMedia ||
-    navigator.msGetUserMedia
-);
+faceapi.env.monkeyPatch({
+    Canvas: HTMLCanvasElement,
+    Image: HTMLImageElement,
+    ImageData: ImageData,
+    Video: HTMLVideoElement,
+    createCanvasElement: () => document.createElement('canvas'),
+    createImageElement: () => document.createElement('img')
+  });
 
-if (typeof navigator.mediaDevices.getUserMedia === 'undefined') {
-    navigator.getUserMedia({
-        video: true
-    }, streamHandler, errorHandler);
-} else {
-    navigator.mediaDevices.getUserMedia({
-        video: true
-    }).then(streamHandler).catch(errorHandler);
-}
 */
 
-// Starte Webcam Video 
+// Starte video Stream
 
 const video = document.querySelector("#video");
 
-function getVideo() {
-    navigator.mediaDevices.getUserMedia(
-        { video: {} },
-        stream => video.srcObject = stream,
-        err => error.log( err || "Video läuft.")
-    )
-}
+// Alternativer Videostart mit asynchroner Funktion
 
-getVideo();
+let loadVideo = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {}
+    });
+    video.srcObject = stream;
+    return new Promise((resolve => {
+        video.onloadmetadata = () => {
+            resolve(video)
+        }
+    }))
+};
+
+// Einbinden der Models
+
+const MODEL_URL = "/assets/shards"
+
+Promise.all([
+    //Nur der Tiny Face Detector läuft im Browser
+    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+    faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+    faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
+]).then(loadVideo())
+
+/*
+await faceapi.loadSsdMobilenetv1Model(MODEL_URL);
+await faceapi.loadFaceLandmarkModel(MODEL_URL);
+await faceapi.loadFaceRecognitionModel(MODEL_URL);
+
+"Default: SSD Mobilenet V1 Face Detector"
+
+const detectionSSD = await faceapi.detectAllFaces(input, new faceapi.SsdMobilenetv1Options())
+const detectionsTinyFace = await faceapi.detectAllFaces(input, new faceapi.TinyFaceDetectorOptions())
+const detectionsMtcnn = await faceapi.detectAllFaces(input, new faceapi.MtcnnOptions())
+*/
+
+// Define Input: Accepted Values: html-images, canvas & video
+
+
+video.addEventListener("play", async () => {
+    let detectedFaces = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+    console.log(detectedFaces);
+});

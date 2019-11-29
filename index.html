@@ -6,16 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Face API by Flo</title>
-    <script src="face-api.min.js"></script>
-    <script src="index.js" defer></script>
+    <script src="assets/face_api/face-api.js" defer></script>
+    <script src="script.js" defer></script>
     <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
+        <img id="rotating" src="assets/media/eye.png">
+        <h1>Show me what you got!</h1>
     <div class="container">
-        <img id="rotating" src="public/content/puzzle.png">
-        <h1>The Codemaster</h1>
-        <video id="video" width="500" height="500" autoplay muted></video>
+        <video id="video"autoplay muted playsinline ></video>
+        <canvas id="canvas"></canvas>
         
     </div>
 </body>
